@@ -2,9 +2,9 @@
 
 **A multi-protocol SDR receiver for Windows. Native decoders for the protocols that matter, plus a curated toolkit for everything else.**
 
-NyxScope is a Rust/Tauri application that decodes most of its digital protocols natively — P25 Phase 1 and Phase 2 voice, EDACS and NXDN control channels, ADS-B, AIS, ACARS, POCSAG, FLEX, LoRa CSS PHY + LoRaWAN MAC, Morse, RDS, CTCSS/DCS, signal classification — in-process, no sidecar. For protocols where a mature open-source decoder already exists, NyxScope bundles it (`multimon-ng`, `rtl_433`, `dsd-neo`, `nrsc5`, `direwolf`, `dumpvdl2`, `dump978`, `rs41mod`) so the app installs with zero `PATH` wrangling. You get spectrum and waterfall, multiple concurrent VFOs, trunked-radio following, digital voice, aviation and marine tracking, paging, ISM sensors, HD Radio, and transcription, in one binary.
+NyxScope is a Rust/Tauri application that decodes most of its digital protocols natively — P25 Phase 1 and Phase 2 voice, EDACS and NXDN control channels, ADS-B, AIS, ACARS, POCSAG, FLEX, LoRa CSS PHY + LoRaWAN MAC, Morse, RDS, CTCSS/DCS, signal classification — in-process, no sidecar. For protocols where a mature open-source decoder already exists, NyxScope bundles it (`dsd-fme`, `multimon-ng`, `rtl_433`, `nrsc5`, `direwolf`, `dumpvdl2`, `dump978`, `rs41mod`) so the app installs with zero `PATH` wrangling. You get spectrum and waterfall, multiple concurrent VFOs, trunked-radio following, digital voice, aviation and marine tracking, paging, ISM sensors, HD Radio, and transcription, in one binary.
 
-[**Download**](https://github.com/ICBizLabs/NyxScope/releases/latest) · [**Website**](https://i-c.biz/) · [**User Manual**](./MANUAL.md) · [**Docs**](https://github.com/ICBizLabs/NyxScope/wiki) · [**Source mirrors**](https://i-c.biz/sources/) · [**Issues**](https://github.com/ICBizLabs/NyxScope/issues)
+[**Download**](https://github.com/ICBizLabs/NyxScope/releases/latest) · [**Website**](https://i-c.biz/) · [**User Manual**](./MANUAL.md) · [**Docs**](https://github.com/ICBizLabs/NyxScope/wiki) · [**Source mirrors**](https://i-c.biz/sources/) · [**Issues**](https://i-c.biz/issues/)
 
 > **NyxScope is a public BETA — features are fluid.** It's stable enough for
 > daily use, but this is active development: **features may be added, changed,
@@ -17,25 +17,6 @@ NyxScope is a Rust/Tauri application that decodes most of its digital protocols 
 ![NyxScope scanning the 800 MHz band — live spectrum and waterfall up top, multiple active VFOs with mini-waterfalls and per-channel audio below](screenshots/Scanning%20800mhz%20Band.png)
 
 *Wideband scanning the 800 MHz band: the live spectrum and waterfall surface every active signal, peaks auto-tune idle VFOs, and each VFO card carries its own mini-waterfall, signal meter, tone/CTCSS readout, and independent audio.*
-
----
-
-## What's new in 1.33.4 (BETA)
-
-Full notes: [`RELEASE_NOTES_v1.33.4.md`](./RELEASE_NOTES_v1.33.4.md).
-
-A small fix update on top of 1.33.3.
-
-- **Stream-restart crash on Windows.** If a radio stalled, the app could crash while trying to restart the stream on its own, most often with more than one radio connected. It now stops that radio cleanly and asks for a reconnect instead.
-- **HackRF Pro on machines with PothosSDR.** If you had PothosSDR installed, the app used its old 2021 drivers, which don't know the HackRF Pro (it showed "undetected" with no audio). The app now always uses its own bundled drivers, so PothosSDR is no longer needed.
-
-Previous release (1.33.3) was about device support. If you own an **Airspy**, that is the one to grab:
-
-- **Airspy audio.** Audio was garbled on every mode for every Airspy user. It was a sample rate problem in the driver layer, not your radio or your setup. Fixed.
-- **HackRF Pro.** The Pro was never detected because our HackRF library was older than the Pro itself. The library is updated and the Pro should now work.
-- **PlutoSDR audio stutter.** The rhythmic breakups in voice audio are gone. The data path between the Pluto and the app was reworked.
-
-Previous release (1.33.2): crash fixes for Airspy/HackRF disconnect, device scanning with foreign Soapy drivers, spectrum short-buffer, and transcription (non-English text + older CPUs without AVX2) — [`RELEASE_NOTES_v1.33.2.md`](./RELEASE_NOTES_v1.33.2.md).
 
 ---
 
@@ -72,7 +53,7 @@ For protocols where a mature open-source decoder already exists, NyxScope bundle
 
 | Tool | What NyxScope uses it for | License |
 | --- | --- | --- |
-| [dsd-neo](https://github.com/arancormonk/dsd-neo) | DMR, D-STAR, YSF, M17, and NXDN voice (P25 voice and EDACS/NXDN control are native) | GPL-3.0-or-later |
+| [dsd-fme](https://github.com/lwvmobile/dsd-fme) | DMR, D-STAR, YSF, M17, and NXDN voice on Windows (P25 voice and EDACS/NXDN control are native) | GPL-2.0-only |
 | [mbelib-neo](https://github.com/arancormonk/mbelib-neo) | IMBE / AMBE+2 vocoder, called from the native P25 paths via an isolated helper | GPL-2.0-or-later |
 | [rtl_433](https://github.com/merbanan/rtl_433) | 200+ ISM-band sensors and utility meters | GPL-2.0-or-later |
 | [multimon-ng](https://github.com/EliasOenal/multimon-ng) | DTMF / ZVEI / EEA / EIA / CCIR tones, EAS/SAME, AFSK, classic packet modes (POCSAG and FLEX are native) | GPL-2.0-or-later |
@@ -81,6 +62,8 @@ For protocols where a mature open-source decoder already exists, NyxScope bundle
 | [dumpvdl2](https://github.com/szpajder/dumpvdl2) | VHF Data Link Mode 2 | GPL-3.0 |
 | [dump978](https://github.com/mutability/dump978) | UAT 978 MHz ADS-B | GPL-2.0 |
 | [rs41mod (RS)](https://github.com/rs1729/RS) | Radiosonde telemetry (RS41, RS92, DFM, M10/M20) | GPL-3.0 |
+| [inmarsat-sniffer](https://github.com/alphafox02/inmarsat-sniffer) | Aero ACARS and STD-C on Inmarsat L-band | GPL-3.0 |
+| [SatDump](https://github.com/SatDump/SatDump) | GOES weather-satellite imagery (downloaded on demand) | GPL-3.0 |
 
 App frameworks: [Rust](https://www.rust-lang.org), [Tauri](https://tauri.app), and [Svelte](https://svelte.dev) — Apache-2.0 / MIT.
 
@@ -307,14 +290,14 @@ bug — as I'm now seeing. Thanks for your help.
 ## Community and support
 
 - **Discord** — join the NyxScope community at [discord.gg/Wf4RRc2VPp](https://discord.gg/Wf4RRc2VPp) for help, signal hunting, and feature talk.
-- **Bug reports & feature requests** — [open an issue](https://github.com/ICBizLabs/NyxScope/issues). Please note whether the bug is in NyxScope itself or in a bundled decoder; protocol-layer issues are usually best filed upstream as well.
+- **Bug reports & feature requests** — [file it on the NyxScope issue tracker](https://i-c.biz/issues/) (or use **Help → Report a Problem** in the app, which attaches your logs automatically). Please note whether the bug is in NyxScope itself or in a bundled decoder; protocol-layer issues are usually best filed upstream as well.
 - **User Manual** — task-oriented walkthrough of the app: scanning, trunking, aircraft, paging, HD Radio, recording, and so on. See [`MANUAL.md`](./MANUAL.md).
 - **Documentation and guides** — the [project wiki](https://github.com/ICBizLabs/NyxScope/wiki): FAQ, hardware & trunking setup, HD Radio, and the HTTP API.
 - **Website** — [i-c.biz](https://i-c.biz/) for downloads, licensing, and the frequency database.
 
 ## Acknowledgments
 
-NyxScope ships its own decoders for most digital protocols and integrates a curated set of established open-source tools for the rest. Thanks to the maintainers of `dsd-neo`, `mbelib-neo`, `rtl_433`, `multimon-ng`, `nrsc5`, `direwolf`, `dumpvdl2`, `dump978`, and `rs41mod`, and to the Rust, Tauri, and Svelte projects — the bundled-tools side of NyxScope rests on their work. The full list of upstream libraries lives in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
+NyxScope ships its own decoders for most digital protocols and integrates a curated set of established open-source tools for the rest. Thanks to the maintainers of `dsd-fme`, `mbelib-neo`, `rtl_433`, `multimon-ng`, `nrsc5`, `direwolf`, `dumpvdl2`, `dump978`, `rs41mod`, `inmarsat-sniffer`, and `SatDump`, and to the Rust, Tauri, and Svelte projects — the bundled-tools side of NyxScope rests on their work. The full list of upstream libraries lives in [`THIRD_PARTY_NOTICES.md`](./THIRD_PARTY_NOTICES.md).
 
 If you find NyxScope useful, please also consider supporting the upstream projects.
 
