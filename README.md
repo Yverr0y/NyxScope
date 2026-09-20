@@ -14,9 +14,9 @@ NyxScope is a Rust/Tauri application that decodes most of its digital protocols 
 > and what doesn't (and whether a bug is in NyxScope or a bundled decoder), and
 > tell us what you'd like added or dropped.
 
-![NyxScope scanning the 800 MHz band — live spectrum and waterfall up top, multiple active VFOs with mini-waterfalls and per-channel audio below](screenshots/Scanning%20800mhz%20Band.png)
+![NyxScope following a P25 trunked system — control channel locked, live spectrum and waterfall, talkgroup calls with source IDs, the multi-site system list, and live decode diagnostics](screenshots/Trunking.png)
 
-*Wideband scanning the 800 MHz band: the live spectrum and waterfall surface every active signal, peaks auto-tune idle VFOs, and each VFO card carries its own mini-waterfall, signal meter, tone/CTCSS readout, and independent audio.*
+*Following a P25 trunked system: NyxScope locks the control channel, follows the voice grants to their talkgroups with source IDs and aliases, lists every site in the system, and shows live decode diagnostics, all while the spectrum and waterfall track the whole band.*
 
 ---
 
@@ -33,7 +33,7 @@ Most of NyxScope's digital decode work runs in native Rust inside the applicatio
 - **ACARS** — native MSK decoder with multi-channel VFO scheduling.
 - **POCSAG 512 / 1200 / 2400** — in-process, no `multimon-ng` subprocess on paging-only ranges.
 - **FLEX 1600 / 3200 / 6400** — in-process, same path.
-- **LoRa CSS PHY** — chirp / dechirp / FFT decoder with parallel SF7–12 paths per channel, Hamming and CRC handling, and LoRaWAN MAC parsing (DevAddr, FCnt, FPort, MType) across nine regional plans.
+- **LoRa CSS PHY** — chirp / dechirp / FFT decoder with parallel SF7–12 paths per channel, Hamming and CRC handling, and LoRaWAN MAC parsing (DevAddr, FCnt, FPort, MType) across nine regional plans. Also decodes **Meshtastic** (node info, text, telemetry, position) and **MeshCore** (adverts, group text), feeding the LoRa-tab node view.
 - **Morse / CW** with on-card readout.
 - **CTCSS / DCS** — Goertzel-based CTCSS (50 tones, median noise-floor gating) and Golay(23,12) DCS (83 codes, every alignment and polarity).
 - **RDS** for WFM (station name, RadioText, PTY, TP/TA).
@@ -129,9 +129,9 @@ P25 (Phase 1 & 2), DMR, NXDN48, NXDN96, D-STAR, Yaesu System Fusion, M17, ProVoi
 
 ### Aviation and marine
 
-![NyxScope in ADS-B mode — aircraft on a live map alongside a sortable table of ICAO codes, callsigns, altitude, speed and heading](screenshots/ADSB.png)
+![NyxScope in ADS-B mode — aircraft on a live map with altitude-coloured trails, a sortable aircraft list, and a detail card showing registration, type and operator](screenshots/ADSB_popout.png)
 
-*ADS-B 1090: aircraft plotted on a live map next to the data table — ICAO hex, callsign, altitude, speed and heading — with optional one-click metadata lookup for registration, type and operator.*
+*ADS-B 1090: aircraft plotted on a live map with altitude-coloured trails, next to a sortable list and a detail card — ICAO hex, callsign, altitude, speed, heading, and one-click metadata lookup for registration, type and operator. The message panel can pop out into its own window.*
 
 - **ADS-B 1090** — live aircraft positions, ICAO codes, altitude, callsigns, on a map.
 - **UAT 978** — general aviation ADS-B (`dump978`).
@@ -153,13 +153,22 @@ A suite of space and L-band receivers (downloaded on demand from the Feature Man
 
 - **Iridium (1.6 GHz)** — built-in native burst decoder (IRA / IBC / IDA and more) with a voice-activity tab, a Ring-Alert preset, and a satellite map view. No external tools or Python needed.
 - **Aero ACARS (Inmarsat L-band, ~1.5 GHz)** — aircraft↔ground satellite messaging via the Inmarsat sniffer, with per-satellite selection (4F3 / 3F5 / AF1 / F1) and an antenna-peaking C/N meter.
+
+![NyxScope decoding Inmarsat Aero ACARS — satellite aircraft messages with registration and flight, per-satellite selection, and a C/N antenna-peaking meter](screenshots/AERO%20Acars.png)
+
+*Aero ACARS (Inmarsat, ~1.5 GHz): satellite aircraft↔ground messaging decoded through the Inmarsat sniffer, with per-satellite selection and a live C/N meter for peaking the L-band dish.*
 - **STD-C (Inmarsat-C, ~1.541 GHz)** — maritime safety + EGC bulletins, with live lock-health diagnostics and offline IQ-file decode.
 - **GOES LRIT (1.69 GHz)** — geostationary weather-satellite imagery via a SatDump sidecar over an in-process `rtl_tcp` bridge, with an az/el pointing helper from your location.
 - **GPS L1** — native acquisition (visible PRNs with SNR and Doppler) for antenna/sky-view validation.
+- **GLONASS L1** — native acquisition detector for GLONASS satellites, alongside GPS L1.
+
+![NyxScope GPS L1 acquisition — detected satellites with their PRN, SNR and Doppler, for validating an L-band antenna and sky view](screenshots/GPS%20L1%20Satellite%20Detector.png)
+
+*GNSS L1 acquisition: NyxScope acquires visible GPS (and GLONASS) satellites with per-PRN SNR and Doppler — a quick way to confirm an L-band antenna and clear sky view before chasing weaker satellite signals.*
 
 ### Paging and sensors
 
-![NyxScope decoding FLEX paging traffic — decoded messages with capcodes and timestamps alongside the spectrum](screenshots/FLEX.png)
+![NyxScope decoding FLEX paging traffic — decoded messages with capcodes and timestamps alongside the spectrum](screenshots/PagerReception.png)
 
 *FLEX paging: NyxScope's native FLEX/POCSAG decoders surface messages with capcodes, timestamps and content. A dedicated wideband pager-monitor mode can watch many paging channels at once across the band.*
 
@@ -167,7 +176,8 @@ A suite of space and L-band receivers (downloaded on demand from the Feature Man
 - **FLEX and FLEX NEXT** with capcode tracking.
 - **rtl_433** — 200+ ISM device types: smart meters (ERT, IDM, NETIDM), weather stations (Bresser, Acurite, LaCrosse, Ambient), tire pressure monitors, garage doors, doorbells, soil moisture, and many more.
 - **Radiosondes** — RS41, RS92, DFM, M10/M20 on 400–406 MHz.
-- **LoRa** — native CSS PHY decoder with multi-region channel plans (US915, EU868, EU433, AU915, AS923, CN470, IN865, KR920, RU864) and LoRaWAN MAC parsing.
+- **LoRa / Meshtastic / MeshCore** — native CSS PHY decoder with multi-region channel plans (US915, EU868, EU433, AU915, AS923, CN470, IN865, KR920, RU864) and LoRaWAN MAC parsing, plus **Meshtastic** and **MeshCore**. The LoRa tab has a live **node view**: the nodes you have heard with name, hardware, channel, SNR, battery and hop count, a chat of their text, and a map of their positions.
+
 
 ![NyxScope decoding ISM sensors via rtl_433 — a table of received devices (smart meters, weather stations, TPMS, remotes) with model, ID and readings](screenshots/sensors.png)
 
@@ -196,6 +206,8 @@ A suite of space and L-band receivers (downloaded on demand from the Feature Man
 - **APRS** packet positions, weather, telemetry, messages.
 - AFSK1200 / AFSK2400 / FSK9600 packet data.
 - D-STAR, YSF, and M17 digital voice.
+- **FT8 / FT4** weak-signal receive, in-process, on wall-clock slot timing.
+- **RTTY** (Baudot) with USB / LSB handling.
 
 ## Quick Modes
 
